@@ -216,6 +216,13 @@ function scoreK(k){
   if(S.nadwaga){eff['odchudzanie']=1;eff['trzustka']=1;}
   if(S.weight<=10)eff['mala_rasa']=1;
   Object.keys(eff).forEach(function(p){if(k.sp.indexOf(p)!==-1)sc+=PUNKTY_POTRZEBY[p]||15;});
+  /* pies na redukcji/z wrazliwa trzustka NIE powinien dostawac karm gestych energetycznie —
+     smakowitosc (wybredny) nie moze przebic zdrowia: kara za brak profilu light,
+     podwojna gdy karma jest kaloryczna jak na swoja forme (np. Kaczka 180 kcal) */
+  if((eff['odchudzanie']||eff['trzustka'])&&k.sp.indexOf('odchudzanie')===-1&&k.sp.indexOf('trzustka')===-1){
+    sc-=12;
+    if(k.kcal>=(k.f==='mokra'?160:370))sc-=10;
+  }
   if(S.kastrat&&!eff['odchudzanie']&&k.sp.indexOf('odchudzanie')!==-1)sc+=10;
   if(S.lubi.length){S.lubi.forEach(function(b){if(k.lb.indexOf(b)!==-1)sc+=4;});var anyMatch=S.lubi.some(function(b){return k.lb.indexOf(b)!==-1;});if(!anyMatch)sc-=8;}
   return sc;
