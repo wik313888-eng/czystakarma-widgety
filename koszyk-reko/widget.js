@@ -198,17 +198,23 @@
     var b = document.body, h = document.documentElement;
     if (getComputedStyle(b).overflow === "hidden") b.style.setProperty("overflow", "visible", "important");
     if (getComputedStyle(h).overflow === "hidden") h.style.setProperty("overflow", "visible", "important");
-    [].forEach.call(document.querySelectorAll("body > *"), function (e) {
-      if (e.id === "ckr-panel" || e.id === "ckr-tlo" || e.tagName === "SCRIPT" || e.tagName === "IFRAME") return;
-      var s = getComputedStyle(e), q = e.getBoundingClientRect();
-      if (s.position !== "fixed" || s.display === "none" || s.pointerEvents === "none") return;
-      if (q.width < innerWidth * 0.9 || q.height < innerHeight * 0.9) return;
-      // pelnoekranowa, a nic na niej nie widac = martwa nakladka po popupie
-      if (Number(s.opacity) < 0.15 || ((e.textContent || "").trim() === "" && s.backgroundImage === "none" && !e.querySelector("img,svg,video"))) {
-        e.style.pointerEvents = "none";
-        e.style.display = "none";
+    // pytamy przegladarke, CO lapie klik w roznych punktach ekranu; niewidzialne pelnoekranowe
+    // warstwy wylaczamy i sprawdzamy, co jest pod spodem — az dojdziemy do prawdziwej tresci
+    var punkty = [[0.5, 0.5], [0.5, 0.25], [0.25, 0.6]];
+    for (var pkt = 0; pkt < punkty.length; pkt++) {
+      for (var i = 0; i < 6; i++) {
+        var el = document.elementFromPoint(Math.round(innerWidth * punkty[pkt][0]), Math.round(innerHeight * punkty[pkt][1]));
+        if (!el || el === b || el === h) break;
+        if (el.closest && el.closest("#ckr-panel")) break;
+        var s = getComputedStyle(el), q = el.getBoundingClientRect();
+        var pelnoekranowa = q.width >= innerWidth * 0.85 && q.height >= innerHeight * 0.85;
+        var przezroczysta = s.backgroundImage === "none" &&
+          (s.backgroundColor === "rgba(0, 0, 0, 0)" || s.backgroundColor === "transparent") &&
+          !(el.textContent || "").trim() && !el.querySelector("img,svg,video,button,input");
+        if (pelnoekranowa && (Number(s.opacity) < 0.15 || przezroczysta)) { el.style.pointerEvents = "none"; continue; }
+        break;                                                              // pod klikiem jest realna tresc — koniec
       }
-    });
+    }
   }
   // obserwator: dopoki nasz panel zyje, KAZDY nowo wstawiony popup Shopera ginie od razu
   var ckrObserwator = null;
