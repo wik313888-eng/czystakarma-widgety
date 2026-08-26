@@ -149,6 +149,7 @@
     if (p) { p.classList.remove("on"); setTimeout(function () { p.remove(); }, 260); }
     if (t) { t.classList.remove("on"); setTimeout(function () { t.remove(); }, 260); }
     if (CFG.ukryjNatywny) [].forEach.call(document.querySelectorAll(CFG.ukryjNatywny), function (e) { e.style.display = ""; });
+    setTimeout(odblokujStrone, 320);   // strona ma byc w pelni klikalna po zamknieciu panelu
   }
 
   /* Shoper pokazuje wlasny popup "Dodano do koszyka" pod naszym panelem — klient po "Kupuje dalej"
@@ -170,6 +171,11 @@
         if ((s.position === "fixed" || s.position === "absolute") && k.getBoundingClientRect().width > 220) {
           if (k.id === "ckr-panel" || (nasz && k.contains(nasz))) return;
           var x = k.querySelector('button[aria-label*="amknij"],button[aria-label*="lose"],button[class*="close"],.modal-close,[data-dismiss]');
+          if (!x) [].some.call(k.querySelectorAll("button"), function (b) {   // krzyzyk bez klasy: maly przycisk "×" lub sama ikona
+            var tb = (b.textContent || "").trim(), q = b.getBoundingClientRect();
+            if ((tb === "×" || tb === "✕" || tb === "X" || tb === "") && q.width > 0 && q.width <= 64 && q.height <= 64) { x = b; return true; }
+            return false;
+          });
           if (x) x.click(); else k.style.display = "none";
           trafienia++;
           return;
@@ -177,10 +183,32 @@
         k = k.parentElement;
       }
     });
-    if (trafienia) [].forEach.call(document.querySelectorAll('.backdrop,[class*="backdrop"],[class*="overlay"]'), function (b) {
-      if (b.id !== "ckr-tlo" && !b.closest("#ckr-panel") && b.getBoundingClientRect().width > 200 && !b.querySelector("#ckr-panel")) b.style.display = "none";
-    });
+    if (trafienia) {
+      [].forEach.call(document.querySelectorAll('.backdrop,[class*="backdrop"],[class*="overlay"]'), function (b) {
+        if (b.id !== "ckr-tlo" && !b.closest("#ckr-panel") && b.getBoundingClientRect().width > 200 && !b.querySelector("#ckr-panel")) b.style.display = "none";
+      });
+      setTimeout(odblokujStrone, 350);   // po animacji zamykania Shopera
+    }
     return trafienia;
+  }
+  /* Po ubitym popupie Shoper potrafi zostawic blokade przewijania na body/html i przezroczysta
+     nakladke lapiaca kliki — strona wyglada na zamrozona. Sprzatamy jedno i drugie. */
+  function odblokujStrone() {
+    if (document.querySelector(".ckr-tlo.on")) return;                      // nasz panel otwarty — jego tlo jest celowe
+    var b = document.body, h = document.documentElement;
+    if (getComputedStyle(b).overflow === "hidden") b.style.setProperty("overflow", "visible", "important");
+    if (getComputedStyle(h).overflow === "hidden") h.style.setProperty("overflow", "visible", "important");
+    [].forEach.call(document.querySelectorAll("body > *"), function (e) {
+      if (e.id === "ckr-panel" || e.id === "ckr-tlo" || e.tagName === "SCRIPT" || e.tagName === "IFRAME") return;
+      var s = getComputedStyle(e), q = e.getBoundingClientRect();
+      if (s.position !== "fixed" || s.display === "none" || s.pointerEvents === "none") return;
+      if (q.width < innerWidth * 0.9 || q.height < innerHeight * 0.9) return;
+      // pelnoekranowa, a nic na niej nie widac = martwa nakladka po popupie
+      if (Number(s.opacity) < 0.15 || ((e.textContent || "").trim() === "" && s.backgroundImage === "none" && !e.querySelector("img,svg,video"))) {
+        e.style.pointerEvents = "none";
+        e.style.display = "none";
+      }
+    });
   }
   // obserwator: dopoki nasz panel zyje, KAZDY nowo wstawiony popup Shopera ginie od razu
   var ckrObserwator = null;
