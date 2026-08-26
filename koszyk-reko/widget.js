@@ -151,6 +151,24 @@
     if (CFG.ukryjNatywny) [].forEach.call(document.querySelectorAll(CFG.ukryjNatywny), function (e) { e.style.display = ""; });
   }
 
+  /* Shoper na stronach kategorii pokazuje wlasny popup "Dodano do koszyka" pod naszym panelem —
+     klient po "Kupuje dalej" musialby zamykac drugie okno. Ubijamy go: najpierw jego wlasnym X
+     (wtedy Shoper sam sprzata backdrop i blokade scrolla), w ostatecznosci chowamy na twardo. */
+  function ubijNatywnyPopup() {
+    var trafienia = 0;
+    [].forEach.call(document.querySelectorAll('[class*="modal"],[class*="popup"],[class*="dialog"]'), function (el) {
+      if (el.id === "ckr-panel" || el.id === "ckr-tlo" || el.style.display === "none") return;
+      if (!/dodano do koszyka/i.test(el.textContent || "")) return;
+      var x = el.querySelector('button[aria-label*="amknij"],button[class*="close"],.modal-close,[data-dismiss]');
+      if (x) x.click(); else el.style.display = "none";
+      trafienia++;
+    });
+    if (trafienia) [].forEach.call(document.querySelectorAll(".backdrop"), function (b) {
+      if (b.id !== "ckr-tlo") b.style.display = "none";
+    });
+    return trafienia;
+  }
+
   function pasekHtml() {
     var brak = Math.max(0, CFG.prog - stanKoszyka.suma);
     var proc = Math.min(100, stanKoszyka.suma / CFG.prog * 100);
@@ -233,16 +251,22 @@
             '<div class="ckr-h">Dobierz do tego</div><div class="ckr-siatka">' + r1.map(function (k) { return kafel(k.t, k.r, k.i); }).join("") + "</div>" +
             (r2.length ? '<div class="ckr-h">Na dłużej i do miski</div><div class="ckr-siatka">' + r2.map(function (k) { return kafel(k.t, k.r, k.i); }).join("") + "</div>" : "") +
           "</div>" +
-          '<div class="ckr-dol"><button class="ckr-kasa">Przejdź do koszyka</button><button class="ckr-dalej">Kupuję dalej</button></div>';
+          '<div class="ckr-dol"><button class="ckr-dalej" id="ckr-btn-koszyk">Do koszyka</button><button class="ckr-kasa" id="ckr-btn-dalej">Kupuję dalej</button></div>';
 
         document.body.appendChild(tlo);
         document.body.appendChild(p);
         setTimeout(function () { tlo.classList.add("on"); p.classList.add("on"); }, 20);   // setTimeout, nie rAF — dziala tez w tle
 
+        // popup Shopera potrafi wyskoczyc chwile PO naszym panelu — polujemy przez ~2,5 s
+        ubijNatywnyPopup();
+        var proby = 0;
+        var lowca = setInterval(function () { ubijNatywnyPopup(); if (++proby >= 14) clearInterval(lowca); }, 180);
+
         tlo.onclick = zamknij;
         p.querySelector(".ckr-x").onclick = zamknij;
-        p.querySelector(".ckr-dalej").onclick = zamknij;
-        p.querySelector(".ckr-kasa").onclick = function () { ga("ckr_do_koszyka", {}); location.href = "/pl/basket"; };
+        // "Kupuję dalej" = glowny przycisk (decyzja usera): panel znika, klient zostaje w zakupach
+        p.querySelector("#ckr-btn-dalej").onclick = zamknij;
+        p.querySelector("#ckr-btn-koszyk").onclick = function () { ga("ckr_do_koszyka", {}); location.href = "/pl/basket"; };
 
         p.addEventListener("click", function (e) {
           var b = e.target.closest && e.target.closest(".ckr-dodaj");
