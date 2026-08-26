@@ -9,8 +9,11 @@
   window.__ckrReko = 1;
 
   var S = document.currentScript || {};
+  // GTM przy wstrzykiwaniu Custom HTML POTRAFI obciac atrybuty data-* — dlatego adres danych
+  // wyprowadzamy z wlasnego src (ten sam katalog i commit co kod), data-baza zostaje jako override
+  var zeSrc = S.src ? S.src.slice(0, S.src.lastIndexOf("/") + 1) : "";
   var CFG = {
-    baza: (S.dataset && S.dataset.baza) || "https://cdn.jsdelivr.net/gh/wik313888-eng/czystakarma-widgety@main/koszyk-reko/",
+    baza: (S.dataset && S.dataset.baza) || zeSrc || "https://cdn.jsdelivr.net/gh/wik313888-eng/czystakarma-widgety@main/koszyk-reko/",
     prog: 299,                 // darmowa dostawa
     ukryjNatywny: ""           // selektor natywnego drawera Shopera, gdyby zaczal kolidowac
   };
