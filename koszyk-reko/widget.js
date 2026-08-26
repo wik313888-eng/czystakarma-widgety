@@ -230,6 +230,9 @@
       var wpis = d.p[String(sid)];
       if (wpis && wpis.length) wpis = { k: wpis };                  // stary format (tablica) tez dziala
       if (!wpis || !wpis.k || !wpis.k.length) return;
+      // nazwa dodanego z bazy (h1 na stronie kategorii to tytul KATEGORII, nie produktu)
+      var wT = d.t.filter(function (t) { return t.s === Number(sid); })[0];
+      if (wT) nazwaDodanego = (wT.b ? wT.b + " " : "") + wT.n;
       return odswiezKoszyk().then(function () {
         styl();
         zamknij();
