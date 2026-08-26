@@ -151,22 +151,47 @@
     if (CFG.ukryjNatywny) [].forEach.call(document.querySelectorAll(CFG.ukryjNatywny), function (e) { e.style.display = ""; });
   }
 
-  /* Shoper na stronach kategorii pokazuje wlasny popup "Dodano do koszyka" pod naszym panelem —
-     klient po "Kupuje dalej" musialby zamykac drugie okno. Ubijamy go: najpierw jego wlasnym X
-     (wtedy Shoper sam sprzata backdrop i blokade scrolla), w ostatecznosci chowamy na twardo. */
+  /* Shoper pokazuje wlasny popup "Dodano do koszyka" pod naszym panelem — klient po "Kupuje dalej"
+     musialby zamykac drugie okno. Ubijamy go NIEZALEZNIE od budowy DOM: szukamy malego elementu
+     z tym tekstem, wspinamy sie do przodka fixed/absolute i zamykamy jego wlasnym X (wtedy Shoper
+     sam sprzata backdrop i blokade scrolla); w ostatecznosci chowamy na twardo. */
   function ubijNatywnyPopup() {
+    var nasz = document.getElementById("ckr-panel");
     var trafienia = 0;
-    [].forEach.call(document.querySelectorAll('[class*="modal"],[class*="popup"],[class*="dialog"]'), function (el) {
-      if (el.id === "ckr-panel" || el.id === "ckr-tlo" || el.style.display === "none") return;
-      if (!/dodano do koszyka/i.test(el.textContent || "")) return;
-      var x = el.querySelector('button[aria-label*="amknij"],button[class*="close"],.modal-close,[data-dismiss]');
-      if (x) x.click(); else el.style.display = "none";
-      trafienia++;
+    [].forEach.call(document.querySelectorAll("h1,h2,h3,h4,div,p,span,strong"), function (el) {
+      if (trafienia || el.children.length > 3) return;
+      var t = el.textContent || "";
+      if (t.length > 60 || !/dodano do koszyka/i.test(t)) return;
+      if (nasz && nasz.contains(el)) return;
+      var k = el;
+      for (var i = 0; i < 10 && k && k !== document.body; i++) {
+        var s;
+        try { s = getComputedStyle(k); } catch (e) { return; }
+        if ((s.position === "fixed" || s.position === "absolute") && k.getBoundingClientRect().width > 220) {
+          if (k.id === "ckr-panel" || (nasz && k.contains(nasz))) return;
+          var x = k.querySelector('button[aria-label*="amknij"],button[aria-label*="lose"],button[class*="close"],.modal-close,[data-dismiss]');
+          if (x) x.click(); else k.style.display = "none";
+          trafienia++;
+          return;
+        }
+        k = k.parentElement;
+      }
     });
-    if (trafienia) [].forEach.call(document.querySelectorAll(".backdrop"), function (b) {
-      if (b.id !== "ckr-tlo") b.style.display = "none";
+    if (trafienia) [].forEach.call(document.querySelectorAll('.backdrop,[class*="backdrop"],[class*="overlay"]'), function (b) {
+      if (b.id !== "ckr-tlo" && !b.closest("#ckr-panel") && b.getBoundingClientRect().width > 200 && !b.querySelector("#ckr-panel")) b.style.display = "none";
     });
     return trafienia;
+  }
+  // obserwator: dopoki nasz panel zyje, KAZDY nowo wstawiony popup Shopera ginie od razu
+  var ckrObserwator = null;
+  function pilnujPopupow() {
+    ubijNatywnyPopup();
+    if (ckrObserwator) return;
+    ckrObserwator = new MutationObserver(function () {
+      if (!document.getElementById("ckr-panel")) return;
+      ubijNatywnyPopup();
+    });
+    ckrObserwator.observe(document.body, { childList: true, subtree: true });
   }
 
   function pasekHtml() {
@@ -260,10 +285,8 @@
         document.body.appendChild(p);
         setTimeout(function () { tlo.classList.add("on"); p.classList.add("on"); }, 20);   // setTimeout, nie rAF — dziala tez w tle
 
-        // popup Shopera potrafi wyskoczyc chwile PO naszym panelu — polujemy przez ~2,5 s
-        ubijNatywnyPopup();
-        var proby = 0;
-        var lowca = setInterval(function () { ubijNatywnyPopup(); if (++proby >= 14) clearInterval(lowca); }, 180);
+        // popup Shopera potrafi wyskoczyc w dowolnym momencie — obserwator pilnuje, poki panel zyje
+        pilnujPopupow();
 
         tlo.onclick = zamknij;
         p.querySelector(".ckr-x").onclick = zamknij;
