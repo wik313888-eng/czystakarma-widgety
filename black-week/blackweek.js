@@ -35,7 +35,8 @@
     ".ckbw-k{display:flex;flex-direction:column;background:#fff;border-radius:14px;padding:12px 12px 14px;" +
     "text-decoration:none;color:#1c1324;position:relative;transition:transform .2s,box-shadow .2s}" +
     ".ckbw-k:hover{transform:translateY(-4px);box-shadow:0 14px 26px -12px rgba(0,0,0,.55);text-decoration:none;color:#1c1324}" +
-    ".ckbw-k img{width:100%;aspect-ratio:1/1;object-fit:contain;margin:0 0 8px;mix-blend-mode:multiply}" +
+    ".ckbw-k img{width:100%;aspect-ratio:1/1;object-fit:contain;margin:0 0 8px;border-radius:10px;mix-blend-mode:multiply}" +
+    ".ckbw{scroll-margin-top:90px}" +
     ".ckbw-m{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#8a7f96}" +
     ".ckbw-n{font-size:15px;font-weight:800;margin:2px 0 8px;color:#1c1324;line-height:1.25}" +
     ".ckbw-c{margin-top:auto;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}" +
@@ -55,13 +56,35 @@
     ".ckbw-k{flex:0 0 46%;scroll-snap-align:start}}" +
     "@media(prefers-reduced-motion:reduce){.ckbw-k,.ckbw-cta a{transition:none}}";
 
+  /* ---------- 3) waski pasek na gorze kazdej strony (poza koszykiem i zamowieniem) ---------- */
+  css += ".ckbw-pas{display:flex;justify-content:center;align-items:center;gap:8px 14px;flex-wrap:wrap;padding:10px 14px;" +
+    "background:linear-gradient(100deg,#120a1e,#2c1245 70%," + FIOLET + ");color:#fff!important;font-size:14px;font-weight:600;" +
+    "text-decoration:none!important;text-align:center;line-height:1.3}" +
+    ".ckbw-pas b{color:" + LIMONKA + ";font-weight:900;letter-spacing:.05em}" +
+    ".ckbw-pas i{font-style:normal;background:" + LIMONKA + ";color:#17101f;border-radius:999px;padding:4px 12px;font-size:12.5px;font-weight:800;white-space:nowrap}" +
+    "@media(max-width:700px){.ckbw-pas{font-size:13px;padding:9px 10px}}";
+
   var styl = document.createElement("style");
   styl.textContent = css;
   document.head.appendChild(styl);
 
-  /* strona glowna? */
   var sciezka = location.pathname.replace(/\/+$/, "") || "/";
-  if (sciezka !== "/" && sciezka !== "/pl") return;
+  var glowna = sciezka === "/" || sciezka === "/pl";
+
+  function pasek() {
+    if (/basket|order|checkout/i.test(sciezka) || document.querySelector(".ckbw-pas")) return;
+    var mn = document.querySelector("main");
+    if (!mn) return;
+    var a = document.createElement("a");
+    a.className = "ckbw-pas";
+    a.href = glowna ? "#black-week" : "/#black-week";
+    a.innerHTML = "<span><b>BLACK WEEK −20%</b> na 5 smaków Kłaczek Menu i 5 przysmaków · do niedzieli 30.11</span><i>Zobacz →</i>";
+    mn.insertBefore(a, mn.firstChild);
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", pasek);
+  else pasek();
+
+  if (!glowna) return;
 
   var P = [
     { m: "Kłaczek Menu 400 g", n: "Kurczak", o: "19,99", c: "15,99", img: 1832, u: "/klaczek-menu-kurczak-400g" },
@@ -96,6 +119,7 @@
     if (document.querySelector(".ckbw")) return;
     var sec = document.createElement("section");
     sec.className = "ckbw";
+    sec.id = "black-week";
     var dni = dniDoKonca();
     sec.innerHTML =
       '<div class="ckbw-head"><span class="ckbw-pill">Tylko do niedzieli 30.11</span>' +
@@ -113,6 +137,8 @@
     while (siatka && siatka.parentElement && siatka.parentElement !== mn) siatka = siatka.parentElement;
     if (siatka && siatka.parentElement === mn) mn.insertBefore(sec, siatka.nextSibling);
     else mn.insertBefore(sec, mn.firstChild);
+    /* wejscie z paska na innej stronie: /#black-week -> przewin, gdy sekcja juz jest */
+    if (location.hash === "#black-week") setTimeout(function () { sec.scrollIntoView({ block: "start" }); }, 300);
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", wstaw);
