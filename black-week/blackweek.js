@@ -21,7 +21,7 @@
     "letter-spacing:.07em;color:" + LIMONKA + ";white-space:nowrap}" +
 
     /* ---------- 2) sekcja na glownej ---------- */
-    ".ckbw{position:relative;overflow:hidden;margin:26px 0 34px;padding:34px 26px 30px;border-radius:24px;" +
+    ".ckbw{position:relative;overflow:hidden;width:91.666%;max-width:1440px;margin:26px auto 34px;padding:34px 26px 30px;border-radius:24px;" +
     "background:radial-gradient(900px 420px at 85% -10%,rgba(216,255,63,.14),transparent 60%)," +
     "linear-gradient(135deg,#120a1e,#2c1245 62%," + FIOLET + ");color:#fff}" +
     ".ckbw *{box-sizing:border-box}" +
@@ -49,7 +49,7 @@
     ".ckbw-cta .ckbw-b1{background:" + LIMONKA + ";color:#17101f}" +
     ".ckbw-cta .ckbw-b2{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.5)}" +
     "@media(max-width:1100px){.ckbw-grid{grid-template-columns:repeat(3,1fr)}}" +
-    "@media(max-width:700px){.ckbw{padding:26px 16px 24px;border-radius:18px}" +
+    "@media(max-width:700px){.ckbw{width:auto;margin:18px 12px 26px;padding:26px 16px 24px;border-radius:18px}" +
     ".ckbw-grid{display:flex;overflow-x:auto;gap:10px;margin:0 -16px;padding:2px 16px 10px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}" +
     ".ckbw-grid::-webkit-scrollbar{display:none}" +
     ".ckbw-k{flex:0 0 46%;scroll-snap-align:start}}" +
@@ -106,12 +106,13 @@
       '<div class="ckbw-cta"><a class="ckbw-b1" href="/klaczek-menu-karma-dla-psa">Karmy Kłaczek Menu</a>' +
       '<a class="ckbw-b2" href="https://czystakarma.pl/karma-suszona-powietrzem-dla-psa">Przysmaki i gryzaki</a></div>';
 
-    var kotwica = document.querySelector(".ck-bialka-wrap");
-    if (kotwica && kotwica.parentElement) kotwica.parentElement.insertBefore(sec, kotwica);
-    else {
-      var mn = document.querySelector("main") || document.body;
-      mn.insertBefore(sec, mn.firstChild);
-    }
+    /* zaraz pod hero: sekcja jako dziecko <main>, po siatce z modulem hero */
+    var mn = document.querySelector("main") || document.body;
+    var hero = document.querySelector(".ck-hero-text");
+    var siatka = hero;
+    while (siatka && siatka.parentElement && siatka.parentElement !== mn) siatka = siatka.parentElement;
+    if (siatka && siatka.parentElement === mn) mn.insertBefore(sec, siatka.nextSibling);
+    else mn.insertBefore(sec, mn.firstChild);
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", wstaw);
