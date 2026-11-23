@@ -93,7 +93,7 @@
     { m: "Kłaczek Menu 400 g", n: "Konina", o: "24,00", c: "19,20", img: 1196, u: "/karma-mokra-konina-dla-psa-alergika-human-grade-szklany-sloik" },
     { m: "Kłaczek Menu 400 g", n: "Kozina", o: "26,00", c: "20,80", img: 1194, u: "/karma-mokra-kozina-dla-psa-alergika-human-grade-szklany-sloik" },
     { m: "Przysmak 300 g", n: "Air Dried konina", o: "45,00", c: "36,00", img: 2155, u: "/suszona-konina-dla-psa-300g-air-dried-horse" },
-    { m: "Przysmak 300 g", n: "Air Dried jagnięcina", o: "45,00", c: "36,00", img: 2226, u: "/suszona-jagniecina-dla-psa-300g-air-dried-lamb" },
+    { m: "Przysmak 300 g", n: "Air Dried jagnięcina", o: "45,00", c: "36,00", img: 2157, u: "/suszona-jagniecina-dla-psa-300g-air-dried-lamb" },
     { m: "Gryzak 150 g", n: "Dental z kaczką", o: "25,00", c: "20,00", img: 2159, u: "/gryzak-dentystyczny-dla-psa-dental-beef-duck-150g" },
     { m: "Gryzak 150 g", n: "Dental z koniną", o: "27,00", c: "21,60", img: 2161, u: "/gryzak-dentystyczny-dla-psa-dental-beef-horse-150g" },
     { m: "Gryzak 150 g", n: "Dental z królikiem", o: "27,00", c: "21,60", img: 2163, u: "/gryzak-dentystyczny-dla-psa-dental-beef-rabbit-150g" }
