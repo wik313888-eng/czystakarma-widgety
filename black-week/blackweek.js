@@ -14,11 +14,11 @@
   var css = "" +
     ".ribbon.ribbon_promo{font-size:0!important;line-height:0!important;letter-spacing:0!important;" +
     "background:linear-gradient(100deg,#17101f,#2c1245 70%," + FIOLET + ")!important;color:" + LIMONKA + "!important;" +
-    "padding:7px 14px 7px 10px!important;border-radius:4px 0 0 4px!important;" +
-    "clip-path:polygon(0 0,100% 0,calc(100% - 9px) 50%,100% 100%,0 100%);" +
+    "padding:9px 19px 9px 12px!important;border-radius:4px 0 0 4px!important;" +
+    "clip-path:polygon(0 0,100% 0,calc(100% - 11px) 50%,100% 100%,0 100%);" +
     "box-shadow:0 2px 8px rgba(23,16,31,.45)!important}" +
-    ".ribbon.ribbon_promo::after{content:'BLACK WEEK −20%';font-size:11px;font-weight:800;line-height:1;" +
-    "letter-spacing:.07em;color:" + LIMONKA + ";white-space:nowrap}" +
+    ".ribbon.ribbon_promo::after{content:'BLACK WEEK −20%';font-size:14px;font-weight:900;line-height:1;" +
+    "letter-spacing:.06em;color:" + LIMONKA + ";white-space:nowrap}" +
 
     /* ---------- 2) sekcja na glownej ---------- */
     ".ckbw{position:relative;overflow:hidden;width:91.666%;max-width:1440px;margin:26px auto 34px;padding:34px 26px 30px;border-radius:24px;" +
@@ -57,7 +57,7 @@
     "@media(prefers-reduced-motion:reduce){.ckbw-k,.ckbw-cta a{transition:none}}";
 
   /* ---------- 3) waski pasek na gorze kazdej strony (poza koszykiem i zamowieniem) ---------- */
-  css += ".ckbw-pas{display:flex;justify-content:center;align-items:center;gap:8px 14px;flex-wrap:wrap;padding:10px 14px;" +
+  css += ".ckbw-pas{display:flex;width:100%;box-sizing:border-box;align-self:stretch;justify-content:center;align-items:center;gap:8px 14px;flex-wrap:wrap;padding:10px 14px;" +
     "background:linear-gradient(100deg,#120a1e,#2c1245 70%," + FIOLET + ");color:#fff!important;font-size:14px;font-weight:600;" +
     "text-decoration:none!important;text-align:center;line-height:1.3}" +
     ".ckbw-pas b{color:" + LIMONKA + ";font-weight:900;letter-spacing:.05em}" +
