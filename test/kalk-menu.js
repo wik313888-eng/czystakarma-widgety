@@ -143,7 +143,8 @@
 
       porcjaDiv.textContent = 'Pies ' + fmtKrotko(waga) + ' kg: ok. ' + porcja + ' g dziennie (2 posiłki po ok. ' + Math.round(porcja / 2) + ' g)';
       var tydz = Math.round(slojkiTydz * 2) / 2;
-      slojkiDiv.innerHTML = opisDzienny(porcja) + ' &nbsp;|&nbsp; ok. ' + fmtKrotko(tydz || 0.5) + ' ' + (tydz === 1 ? 'słoik' : 'słoika') + ' tygodniowo';
+      tydz = tydz || 0.5;
+      slojkiDiv.innerHTML = opisDzienny(porcja) + ' &nbsp;|&nbsp; ok. ' + fmtKrotko(tydz) + ' ' + (tydz % 1 ? 'słoika' : odmianaSloik(tydz)) + ' tygodniowo';
       kosztyDiv.innerHTML = 'Koszt dzienny: <strong style="color:#401f58">~' + fmt(kosztDzien, 2) + ' zł</strong>' +
         (jestZestawem ? ' <span style="color:#926bb8;font-size:12px;">(cena słoika w zestawie: ' + fmt(cenaSloika, 2) + ' zł)</span>' : '') +
         '<br>Koszt miesięczny: <strong style="color:#401f58">~' + Math.round(kosztDzien * 30) + ' zł</strong>';
@@ -153,7 +154,7 @@
         var ileZest = Math.max(1, Math.round(slojkiMiesiac / 12));
         var opisZest = ileZest === 1
           ? 'Zamów <strong>1 zestaw 12 słoików (11+1 gratis)</strong> — 1 słoik gratis, taniej niż osobno.'
-          : 'Zamów <strong>' + ileZest + ' × zestaw 12 słoików (11+1 gratis)</strong> — łącznie ' + (ileZest * 12) + ' słoików, ' + ileZest + ' gratis.';
+          : 'Zamów <strong>' + ileZest + ' × zestaw 12 słoików (11+1 gratis)</strong> — łącznie ' + (ileZest * 12) + ' ' + odmianaSloik(ileZest * 12) + ', ' + ileZest + ' gratis.';
         zestawDiv.innerHTML = '💡 Taniej w zestawie: ' + opisZest + ' <span id="km-zestaw-link" style="color:#401f58;font-weight:700;white-space:nowrap;cursor:pointer;text-decoration:underline;">Zobacz zestaw →</span>';
         zestawDiv.style.display = 'block';
         var linkZestaw = document.getElementById('km-zestaw-link');
